@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>My Debugging Log: What Had You Been Doing Before the System Crashed?</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@500;700;800&family=Source+Serif+4:ital,wght@0,400;0,600;1,400&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#f3ecdc;--ink:#0d2b3a;--mute:#4d6672;--card:#fbf7ec;--line:#d6cbb0;--sea:#0f6f73;--hl:#ffd98a;--hero:#0d2b3a;--heroink:#f3ecdc;--heroacc:#59d2c4;
+box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#0a1a22;--ink:#e9e2d0;--mute:#9db3bb;--card:#102632;--line:#25414f;--sea:#59d2c4;--hl:#5b4a1b;--hero:#06121a}}
+:root[data-theme="dark"]{--bg:#0a1a22;--ink:#e9e2d0;--mute:#9db3bb;--card:#102632;--line:#25414f;--sea:#59d2c4;--hl:#5b4a1b;--hero:#06121a}
+html{scroll-padding-top:env(safe-area-inset-top,0px);scroll-behavior:smooth}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font:18px/1.65 "Source Serif 4",Georgia,serif}
+h1,h2,h3,nav,.chip,th,.spk{display:inline-block;min-width:76px;font:700 15px "Bricolage Grotesque",sans-serif;color:var(--sea)}
+ul.talk{padding-left:24px;max-width:72ch}ul.talk li{margin:10px 0}
+ul.talk{list-style:none;padding:0;max-width:72ch}
+ul.talk li{margin:10px 0;display:flex;gap:12px;align-items:baseline}
+.who{flex:none;width:26px;height:26px;border-radius:50%;display:inline-grid;place-items:center;font:700 14px "Bricolage Grotesque",sans-serif;background:var(--sea);color:var(--bg)}
+.who.w2{background:transparent;color:var(--sea);border:2px solid var(--sea)}
+.tag{font-family:"Bricolage Grotesque","Segoe UI",system-ui,sans-serif}
+.hero{background:var(--hero);color:var(--heroink);padding:72px 20px 56px}
+.wrap{max-width:860px;margin:0 auto;padding:0 20px}
+.hero .wrap{padding:0}
+.hero small{color:var(--heroacc);font:500 15px "Bricolage Grotesque",sans-serif}
+h1{font-size:clamp(34px,7vw,64px);line-height:1.05;margin:14px 0 22px;font-weight:800;letter-spacing:-.02em}
+.answer{font-size:clamp(20px,3.4vw,28px);border-left:4px solid var(--heroacc);padding-left:16px;max-width:640px}
+.answer b{color:var(--heroacc)}
+.meta{margin-top:26px;font-size:15px;opacity:.85}
+nav{position:sticky;top:env(safe-area-inset-top,0px);background:var(--bg);border-bottom:1px solid var(--line);z-index:5;overflow-x:auto;white-space:nowrap}
+nav a{display:inline-block;padding:12px 14px;color:var(--ink);text-decoration:none;font-size:15px;font-weight:500}
+nav a:hover,nav a:focus-visible{background:var(--hl);outline:none}
+section{padding:56px 0 8px;border-bottom:1px solid var(--line)}
+h2{font-size:clamp(26px,4.5vw,36px);margin:0 0 18px;letter-spacing:-.01em}
+h3{font-size:20px;margin:28px 0 8px}
+p{max-width:68ch}
+em.pp{font-style:normal;background:var(--hl);padding:0 3px;border-radius:3px}
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:18px;margin:12px 0 24px}
+.box{background:var(--card);border:1px solid var(--line);border-radius:8px;padding:6px 18px 14px}
+.box h3{margin-top:12px;color:var(--sea)}
+ol.s{padding-left:24px}
+ol.s li{margin:6px 0}
+ol.s b{background:var(--hl);padding:0 3px;border-radius:3px}
+.scroll{overflow-x:auto;margin:12px 0 24px}
+table{border-collapse:collapse;width:100%;min-width:520px;font-size:16px}
+th,td{border-bottom:1px solid var(--line);padding:9px 10px;text-align:left;vertical-align:top}
+th{background:var(--card);font-size:15px}
+.chips{display:flex;flex-wrap:wrap;gap:8px;margin:14px 0}
+.chip{border:1.5px solid var(--sea);background:transparent;color:var(--ink);padding:7px 14px;border-radius:99px;font-size:16px;cursor:pointer}
+.chip:hover{background:var(--hl)}
+.chip[aria-pressed="true"]{background:var(--sea);color:var(--bg)}
+.chip:focus-visible,button:focus-visible{outline:3px solid var(--sea);outline-offset:2px}
+#detail{background:var(--card);border:1px solid var(--line);border-left:5px solid var(--sea);border-radius:6px;padding:14px 18px;min-height:96px}
+#detail p{margin:4px 0}
+.qa{margin:20px 0}
+.qa h3{margin:0 0 4px;font-size:19px}
+.video{aspect-ratio:16/9;background:var(--card);border:2px dashed var(--line);display:grid;place-items:center;text-align:center;padding:16px;color:var(--mute);border-radius:8px}
+footer{padding:36px 0 56px;color:var(--mute);font-size:15px}
+.spk{display:inline-block;min-width:76px;font:700 15px "Bricolage Grotesque",sans-serif;color:var(--sea)}
+ul.talk{padding-left:24px;max-width:72ch}ul.talk li{margin:10px 0}
+.tag{display:inline-block;background:var(--card);border:1px solid var(--line);border-radius:4px;padding:1px 8px;font-size:14px;margin-right:6px}
+@media (prefers-reduced-motion:reduce){html{scroll-behavior:auto}}
+
+.tools{display:flex;flex-wrap:wrap;gap:8px;margin:14px 0}
+.story p{margin:0 0 14px}
+.story mark{border-radius:3px;padding:0 2px;color:inherit}
+mark.p{background:var(--hl)}mark.m{background:transparent;border-bottom:3px solid var(--sea)}
+mark.v{background:var(--sea);color:var(--bg)}
+.count{font:600 15px "Bricolage Grotesque",sans-serif;color:var(--mute)}
+.ev{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:18px;margin:16px 0 28px}
+.shot{border-radius:8px;overflow:hidden;font-size:14px;line-height:1.5;border:1px solid #2a3b47}
+.shot h4{margin:0;padding:8px 12px;font:600 13px "Bricolage Grotesque",sans-serif;letter-spacing:.04em}
+.gh{background:#0d1117;color:#e6edf3}.gh h4{background:#161b22}
+.gh .msg{padding:12px;font-weight:600}.gh .meta{padding:0 12px 12px;color:#8b949e;font-size:13px}
+.term{background:#0b1620;color:#cfe3ee;font-family:ui-monospace,Consolas,monospace;font-size:12.5px}.term h4{background:#13232f;font-family:inherit}
+.term pre{margin:0;padding:12px;white-space:pre-wrap}.term .e{color:#ff7b72}.term .w{color:#e3b341}
+.sl{background:#fff;color:#1d1c1d;border-color:#d0c8d8}.sl h4{background:#4a154b;color:#fff}
+.sl .row{display:flex;gap:10px;padding:12px}.av{flex:none;width:34px;height:34px;border-radius:6px;background:#2bac76;color:#fff;display:grid;place-items:center;font-weight:700}
+.sl b{font-weight:700}.sl small{color:#696969}
+.blk{background:var(--card);border:1px solid var(--line);border-left:5px solid var(--sea);border-radius:6px;padding:6px 20px 12px;margin:16px 0}
+.blk h3{margin:12px 0 6px}
+.blur .blk p{filter:blur(7px);transition:filter .2s;cursor:pointer}.blur .blk p:hover,.blur .blk p:focus{filter:none}
+.tag{display:block;font:700 12px "Bricolage Grotesque",sans-serif;letter-spacing:.06em;text-transform:uppercase;color:var(--sea);margin:0 0 2px;padding:0;border:0;background:none}
+.pron td:first-child{font-weight:700;white-space:nowrap}
+</style>
+</head>
+<body>
+<header class="hero"><div class="wrap">
+<small>English IV · Past Perfect Progressive + Software Engineering · Universidad del Pacífico</small>
+<h1>My Debugging Log</h1>
+<p class="answer">What had we been doing before the <b>SICUA</b> system crashed?</p>
+<p class="meta">Sarly Samira Naranjo Tello and Emmanuel Paz Cabezas · Professor Segundo Félix Quiñones Angulo</p>
+</div></header>
+<nav aria-label="Sections"><div class="wrap"><a href="#p1">Part 1: The Incident</a><a href="#p2">Part 2: Evidence</a><a href="#p3">Part 3: Video</a></div></nav>
+<main class="wrap">
+
+<section id="p1"><h2>Part 1: The Incident</h2>
+<p>Incident Report. Use the buttons to see the grammar and the technical vocabulary inside the story.</p>
+<div class="tools" id="tools" role="group" aria-label="Highlight options"></div>
+<div class="story" id="story"></div>
+<p class="count" id="count"></p>
+</section>
+
+<section id="p2"><h2>Part 2: Evidence</h2>
+<p>Three screenshots that support our story.</p>
+<div class="ev">
+<div class="shot gh"><h4>1 · GITHUB COMMIT</h4>
+<div class="msg">fix(server): resolved memory leak that had been causing database crashes</div>
+<div class="meta">Emmanuel Paz &lt;epaz@unipacifico.edu.co&gt; committed on Thursday, Oct 15, 2026 at 9:45 PM · main · 8f3a19b</div></div>
+<div class="shot term"><h4>2 · SERVER ERROR MESSAGE</h4>
+<pre><span class="e">[2026-10-15 22:00:12 UTC] [CRITICAL] [SERVER_CRASH]
+FATAL ERROR: Out of Memory (OOM Killer triggered).
+Process 'flask_app_service' terminated unexpectedly.</span>
+Details: System resource exhaustion detected after running continuous background queries.
+<span class="w">Status: Database connection pool exhausted (Error 500).</span></pre></div>
+<div class="shot sl"><h4>3 · SLACK · #sicua-dev</h4>
+<div class="row"><div class="av">E</div><div><b>Emmanuel Paz (DevOps Engineer)</b> <small>10:05 PM</small><br>@channel Heads up team! The main SICUA server crashed at 10:00 PM. I had been debugging the database connections when the service went down. The patch is ready and we are deploying the hotfix right now.</div></div></div>
+</div></section>
+
+<section id="p3"><h2>Part 3: Video (90 seconds)</h2>
+<p>Two continuous blocks: Sarly speaks first, then Emmanuel. The small labels show which part of the activity each paragraph covers; do not say them aloud. Show each screenshot while Emmanuel mentions it.</p>
+<label><input type="checkbox" id="blur"> Practice mode: blur the script (click a paragraph to peek)</label>
+<div id="script">
+<div class="blk"><h3>Sarly</h3><p tabindex="0"><span class="tag">Intro</span>Hello everyone! We are Sarly and Emmanuel, and this is our Debugging Log about SICUA, our university access control system.</p><p tabindex="0"><span class="tag">Part 1 · Incident</span>Last Thursday evening, the server crashed at ten p.m. Before the crash, we had been working on the production environment for four hours. We had been attempting to deploy a new update, and we had been compiling the core repository for nearly two hours.</p><p tabindex="0"><span class="tag">Question 1</span>So, what had we been doing before we found the bug? We had been analyzing CPU spikes, and we had been ignoring some minor warnings in the database.</p></div>
+<div class="blk"><h3>Emmanuel</h3><p tabindex="0"><span class="tag">Part 2 · Evidence</span>Now we are going to show our evidence. First, this is our GitHub commit: it says we fixed a memory leak that had been causing database crashes. Second, this is the server error message: the memory ran out and the service stopped. Third, this is the Slack message we sent to our team about the problem in SICUA.</p><p tabindex="0"><span class="tag">Question 2</span>And how long had we been working when the system crashed? We had been working for four hours, and our team had been analyzing CPU spikes since eight a.m.</p><p tabindex="0"><span class="tag">Closing</span>An unoptimized query had been running in the background and using all the memory. Finally, we debugged the code, applied a hotfix patch, and restored all services. Thank you!</p></div>
+</div>
+<h3>Pronunciation</h3>
+<div class="scroll"><table class="pron">
+<tr><th>Word</th><th>Sounds like</th></tr>
+<tr><td>had been</td><td>“had-bin”, fast and together</td></tr>
+<tr><td>crashed</td><td>“crasht” (one syllable)</td></tr>
+<tr><td>database</td><td>“DEI-ta-beis”</td></tr>
+<tr><td>deploy</td><td>“di-PLOI”</td></tr>
+<tr><td>patch</td><td>“patch”, with “ch” as in chair</td></tr>
+<tr><td>commit</td><td>“ku-MIT”</td></tr>
+</table></div>
+</section>
+</main>
+<footer><div class="wrap">My Debugging Log · English IV · Professor Segundo Félix Quiñones Angulo · Universidad del Pacífico</div></footer>
+<script>
+var P=["On Thursday, October 15, a critical failure occurred in our SICUA application server at 10:00 PM. Before the system crashed, I had been working on the production environment for four hours. How long had the team been monitoring the memory logs before the incident happened? We had been analyzing CPU spikes since 8:00 AM without noticing any major issues.", "Before the main outage, I had been attempting to deploy a new update. I had been trying to compile the updated core repository for nearly two hours when the primary database suddenly stopped responding. Prior to that, my teammate had been preparing a full database backup, but the task failed because the disk space was exhausted.", "While investigating, I realized that I had been ignoring minor warnings before the system completely went down. I had been pushing every new code commit directly to the staging pipeline while the lead engineer had been testing a hotfix patch.", "Immediately after the crash, we began to debug the entire stack. We discovered a critical memory leak bug that had been corrupting active user sessions. The server had been consuming excessive RAM because an unoptimized query had been running continuously in the background. After isolating the issue, we deployed a stability patch and restored all services.", "This incident taught us to read every warning. We had been working hard, but we had not been checking the logs carefully. Now our team reads the server messages every morning before we start coding, and we make a backup every night."];
+var VOC=["debug","deploy","compile","crash","backup","server","database","bug","patch","commit"];
+var RX={debug:"debug\\w*",deploy:"deploy\\w*",compile:"compil\\w*",crash:"crash\\w*",backup:"backups?",server:"servers?",database:"databases?",bug:"bugs?",patch:"patch\\w*",commit:"commit\\w*"};
+var on={ppp:false,mk:false},von={};
+var story=document.getElementById("story"),tools=document.getElementById("tools"),cnt=document.getElementById("count");
+function esc(s){return s.replace(/&/g,"&amp;").replace(/</g,"&lt;")}
+function render(){
+ var parts=[],cls=[];
+ if(on.ppp){parts.push("\\bhad (?:not )?been\\b");cls.push("p")}
+ VOC.forEach(function(v){if(von[v]){parts.push("\\b"+RX[v]+"\\b");cls.push("v")}});
+ if(on.mk){parts.push("\\b(?:for|since|before|when|how long)\\b");cls.push("m")}
+ var re=parts.length?new RegExp(parts.map(function(x){return "("+x+")"}).join("|"),"gi"):null;
+ story.innerHTML=P.map(function(t){
+  if(!re)return "<p>"+esc(t)+"</p>";
+  return "<p>"+esc(t).replace(re,function(){var a=arguments,i=1;for(;i<=parts.length;i++){if(a[i]!==undefined)break}return '<mark class="'+cls[i-1]+'">'+a[0]+"</mark>"})+"</p>";
+ }).join("");
+ for(var k=0;k<tools.children.length;k++){var b=tools.children[k];b.setAttribute("aria-pressed",String(!!(b.dataset.k==="ppp"?on.ppp:b.dataset.k==="mk"?on.mk:von[b.dataset.k])))}
+}
+function btn(label,k,fn){var b=document.createElement("button");b.className="chip";b.type="button";b.textContent=label;b.dataset.k=k;b.setAttribute("aria-pressed","false");b.onclick=fn;tools.appendChild(b)}
+btn("had been + verb-ing","ppp",function(){on.ppp=!on.ppp;render()});
+btn("for / since / before / when / how long","mk",function(){on.mk=!on.mk;render()});
+VOC.forEach(function(v){var b=document.createElement("button");b.className="chip";b.type="button";b.textContent=v;b.dataset.k=v;b.setAttribute("aria-pressed","false");b.onclick=function(){von[v]=!von[v];render()};tools.appendChild(b)});
+var all=P.join(" ");cnt.textContent=all.split(/\s+/).length+" words · "+(all.match(/had (not )?been/gi)||[]).length+" sentences with had been";
+render();
+document.getElementById("blur").onchange=function(){document.getElementById("script").className=this.checked?"blur":""};
+</script>
+</body>
+</html>
